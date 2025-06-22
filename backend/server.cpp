@@ -84,10 +84,76 @@ void OrderBook::displayOrderBook() const {
             for (const auto& order : ordersAtPrice){
                 totalQuantity+= order.quantity;
             }
-            std::cout<<"Price"<<std::fixed<<std::setprecision(2)<<price;
-            << "| quantity:"<<totalQuantity;
+            std::cout<<"Price"<<std::fixed<<std::setprecision(2)<<price
+            << "| quantity:"<<totalQuantity
             <<"Orders:"<<ordersAtPrice.size()<<std::endl;
         }
     }
  //Bids buy orders
+ std::cout<<"Bids by orders"<<std::endl;
+ if (bids.empty()){
+    std::cout << "No bid orders"<<std::endl;
+ } else {
+    for (auto it = bids.rbegin(); it != bids.rend();++it){
+        double price = it->first;
+        const std::vector<Order>& ordersAtPrice = it->second;
+        int totalQuantity = 0;
+        for (const auto& order : ordersAtPrice){
+            totalQuantity += order.quantity
+        }
+        std::cout<<"Price:"<<std::fixed<<std::setprecision(2)<<price
+        << "| Quantity:"<<totalQuantity
+        << "(orders):"<<ordersAtPrice.size()<<std::endl;
+    }
+ }
+ std::cout <<"--------"<<std::endl;
 }
+
+private:
+    void matchOrders(Order&  newOrder){
+        if (newOrder.type == OrderType::BUY){
+            auto it = asks.begin()
+            while (it !=asks.end() && newOrder.quantity>0){
+                double askPrice = it->first;
+                if (newOrder.price >= askPrice){
+                    std::vector<Order>& ordersAtPrice = it->second;
+                    auto orderIt = ordersAtPrice.begin();
+                    while (orderIt!= ordersAtPrice.end() && newOrder.quantity>0){
+                        Order& existsingOrder = *orderIt;
+                        int fillQuantity = std::min(newOrder.quantity,existingOrder.quantity);
+                        std::cout << " Matching"<<fillQuantity<< "units:"<<std::endl;
+                        std::cout << "New Order:"; newOrder.print();
+                        std::cout<< "Existing Ask:";existingOrder.print();
+                        newOrder.quantity -= fillQuantity;
+                        existingOrder.quantity -= fillQuantity;
+                        
+                        if (existingOrder.quantity==0){
+                            std::cout<<"Existing ask order"<<existingOrder.orderId<<"Fully filled"<<std::endl;
+                            orderIt = ordersAtPrice.erase(orderIt);
+
+                        } else {
+                            std::cout<< "existing ask order"<<existingOrder.orderId<< "fully filled." << std::endl;
+                            ++orderIt;
+
+                        }
+
+                        if (ordersatPrice.empty()){
+                            std::cout<<" Ask price level"<<std::fixed <<std::setprecision(2)<<askPrice<<" is now empty. Removing"<<std::endl;
+                            it = asks.erase(it);
+                        } else {
+                            ++it;
+                        }
+
+                    } else {
+                        break;
+                    }
+                } else {
+                    auto it = bids.rbegin();
+                    while (it !=bids.rend() && newOrder.quantity>0){
+                        double bidPrice = it->first;
+                        if (newOrder.price <=bidprice){}
+                    }
+                }
+            }
+        }
+    }
